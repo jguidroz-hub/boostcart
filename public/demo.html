@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoostCart Widget Demo — Live on BigCommerce</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8f9fa; }
+    .demo-header { background: #1a1a2e; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+    .demo-header h1 { font-size: 18px; font-weight: 600; }
+    .demo-header .badge { background: #22c55e; color: white; font-size: 11px; padding: 4px 12px; border-radius: 20px; }
+    .demo-content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    .order-confirmation { background: white; border-radius: 12px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 30px; }
+    .order-confirmation h2 { color: #16a34a; margin-bottom: 8px; }
+    .order-confirmation p { color: #6b7280; }
+    .order-details { margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+    .order-item { display: flex; justify-content: space-between; padding: 8px 0; }
+    .order-total { font-weight: 700; border-top: 2px solid #e5e7eb; margin-top: 8px; padding-top: 8px; }
+
+    /* BoostCart Widget Styles */
+    #boostcart-widget {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      border: 2px solid #3b82f6;
+      overflow: hidden;
+      animation: slideUp 0.5s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .widget-header {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .widget-header h3 { font-size: 18px; font-weight: 700; }
+    .timer { background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+    .widget-body { padding: 24px; display: flex; gap: 24px; }
+    .widget-image { flex: 0 0 180px; }
+    .widget-image img { width: 180px; height: 180px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb; }
+    .widget-info { flex: 1; }
+    .widget-info h4 { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 8px; }
+    .widget-info p { color: #6b7280; font-size: 14px; line-height: 1.5; margin-bottom: 16px; }
+    .price-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .price-original { text-decoration: line-through; color: #9ca3af; font-size: 16px; }
+    .price-final { color: #16a34a; font-size: 24px; font-weight: 700; }
+    .discount-badge { background: #dcfce7; color: #16a34a; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .widget-actions { display: flex; flex-direction: column; gap: 8px; }
+    .btn-accept { background: #3b82f6; color: white; border: none; padding: 14px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-accept:hover { background: #2563eb; }
+    .btn-decline { background: transparent; border: none; color: #9ca3af; font-size: 13px; cursor: pointer; padding: 8px; }
+    .btn-decline:hover { color: #6b7280; }
+    .powered-by { text-align: center; padding: 12px; border-top: 1px solid #f3f4f6; color: #d1d5db; font-size: 11px; }
+    .powered-by a { color: #9ca3af; text-decoration: none; }
+    .status-bar { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px 20px; margin-top: 30px; }
+    .status-bar h4 { color: #16a34a; margin-bottom: 8px; }
+    .status-bar code { background: #e5e7eb; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    .loading { text-align: center; padding: 40px; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <div class="demo-header">
+    <h1>🚀 BoostCart Widget — Live Demo</h1>
+    <span class="badge">✓ Connected to BigCommerce Store</span>
+  </div>
+
+  <div class="demo-content">
+    <!-- Simulated Order Confirmation -->
+    <div class="order-confirmation">
+      <h2>✓ Thank you for your order!</h2>
+      <p>Order #1001 has been placed successfully.</p>
+      <div class="order-details">
+        <div class="order-item">
+          <span>[Sample] Fog Linen Chambray Towel</span>
+          <span>$49.00</span>
+        </div>
+        <div class="order-item order-total">
+          <span>Total</span>
+          <span>$49.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BoostCart Upsell Widget (fetches real data from API) -->
+    <div id="boostcart-widget">
+      <div class="loading">Loading upsell offer...</div>
+    </div>
+
+    <div class="status-bar" id="status">
+      <h4>🔗 Connection Info</h4>
+      <p>Store: <code>v5haesfq2b</code> (BoostCart Demo on BigCommerce)<br>
+      API: <code>https://boostcart.vercel.app/api/widget/offer</code><br>
+      Status: Fetching...</p>
+    </div>
+  </div>
+
+  <script>
+    // Fetch real offer data from the BoostCart API
+    var API_URL = 'https://boostcart.vercel.app/api/widget/offer';
+    var STORE_HASH = 'v5haesfq2b';
+
+    fetch(API_URL + '?storeHash=' + STORE_HASH + '&orderId=1001&productIds=77')
+      .then(function(r) { return r.json(); })
+      .then(function(response) {
+        var offer = response.data;
+        if (!offer) {
+          document.getElementById('boostcart-widget').innerHTML = '<div class="loading">No offer available</div>';
+          return;
+        }
+
+        var timerSeconds = offer.timerSeconds || 300;
+        var minutes = Math.floor(timerSeconds / 60);
+        var seconds = timerSeconds % 60;
+
+        var widget = document.getElementById('boostcart-widget');
+        widget.innerHTML = '' +
+          '<div class="widget-header">' +
+          '  <h3>' + offer.title + '</h3>' +
+          '  <span class="timer" id="timer">' + minutes + ':' + (seconds < 10 ? '0' : '') + seconds + '</span>' +
+          '</div>' +
+          '<div class="widget-body">' +
+          '  <div class="widget-image">' +
+          '    <img src="' + (offer.product ? offer.product.image : '') + '" alt="' + (offer.product ? offer.product.name : '') + '">' +
+          '  </div>' +
+          '  <div class="widget-info">' +
+          '    <h4>' + (offer.product ? offer.product.name : 'Product') + '</h4>' +
+          '    <p>' + (offer.description || '') + '</p>' +
+          '    <div class="price-row">' +
+          '      <span class="price-original">$' + (offer.product ? offer.product.originalPrice.toFixed(2) : '0.00') + '</span>' +
+          '      <span class="price-final">$' + (offer.product ? offer.product.finalPrice.toFixed(2) : '0.00') + '</span>' +
+          '      <span class="discount-badge">' + (offer.discountValue || 0) + '% OFF</span>' +
+          '    </div>' +
+          '    <div class="widget-actions">' +
+          '      <button class="btn-accept" onclick="acceptOffer()">' + (offer.ctaText || 'Add to Order') + '</button>' +
+          '      <button class="btn-decline" onclick="declineOffer()">' + (offer.declineText || 'No thanks') + '</button>' +
+          '    </div>' +
+          '  </div>' +
+          '</div>' +
+          '<div class="powered-by">Powered by <a href="https://boostcart.vercel.app">BoostCart</a></div>';
+
+        // Start countdown timer
+        var remaining = timerSeconds;
+        var timerEl = document.getElementById('timer');
+        setInterval(function() {
+          remaining--;
+          if (remaining <= 0) remaining = 0;
+          var m = Math.floor(remaining / 60);
+          var s = remaining % 60;
+          timerEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+        }, 1000);
+
+        // Update status
+        document.getElementById('status').innerHTML =
+          '<h4>✅ Widget Loaded Successfully</h4>' +
+          '<p>Store: <code>v5haesfq2b</code> (BoostCart Demo on BigCommerce)<br>' +
+          'API: <code>' + API_URL + '</code><br>' +
+          'Offer: <code>' + offer.offerId + '</code><br>' +
+          'Product: <code>' + (offer.product ? offer.product.name : 'N/A') + '</code> — $' + (offer.product ? offer.product.originalPrice : 0) + ' → $' + (offer.product ? offer.product.finalPrice : 0) + '<br>' +
+          'Status: <span style="color:#16a34a;font-weight:600">Live & Working ✓</span></p>';
+      })
+      .catch(function(err) {
+        document.getElementById('boostcart-widget').innerHTML = '<div class="loading">Error: ' + err.message + '</div>';
+      });
+
+    function acceptOffer() {
+      alert('🎉 Upsell accepted! In production, this would add the item to the order via BigCommerce API.');
+    }
+    function declineOffer() {
+      document.getElementById('boostcart-widget').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
