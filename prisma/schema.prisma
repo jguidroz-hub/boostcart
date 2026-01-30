@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id            String        @id @default(cuid())
+  storeHash     String        @unique
+  accessToken   String
+  storeName     String?
+  storeUrl      String?
+  ownerEmail    String?
+  plan          String        @default("free_trial")
+  installedAt   DateTime      @default(now())
+  uninstalledAt DateTime?
+  isActive      Boolean       @default(true)
+  offers        Offer[]
+  events        UpsellEvent[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([storeHash])
+}
+
+model Offer {
+  id              String        @id @default(cuid())
+  storeId         String
+  store           Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name            String
+  type            String        // "post_purchase" | "in_cart" | "thank_you"
+  status          String        @default("active") // "active" | "paused" | "archived"
+  triggerType     String        // "product" | "category" | "any"
+  triggerIds      String[]      // product or category IDs that trigger this offer
+  upsellProductId Int           // BigCommerce product ID to upsell
+  discountType    String?       // "percentage" | "fixed" | null
+  discountValue   Float?
+  title           String
+  description     String?
+  ctaText         String        @default("Add to Order")
+  declineText     String        @default("No thanks")
+  priority        Int           @default(0)
+  showTimer       Boolean       @default(true)
+  timerSeconds    Int           @default(300)
+  events          UpsellEvent[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([storeId, status])
+  @@index([storeId, type])
+}
+
+model UpsellEvent {
+  id        String   @id @default(cuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  offerId   String
+  offer     Offer    @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  orderId   Int      // BigCommerce order ID
+  action    String   // "shown" | "accepted" | "declined" | "timeout"
+  revenue   Float?   // Revenue generated if accepted
+  createdAt DateTime @default(now())
+
+  @@index([storeId, createdAt])
+  @@index([offerId, action])
+}
