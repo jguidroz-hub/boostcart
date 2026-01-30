@@ -1,7 +1,8 @@
 # BoostCart — Deployment Status
 
 > **Deployed:** January 30, 2026
-> **Status:** ✅ LIVE on Vercel (code deployed, needs DB + BC credentials for full operation)
+> **Infra Wired:** January 30, 2026
+> **Status:** ✅ FULLY OPERATIONAL — Database provisioned, BigCommerce credentials set, deployed to production
 
 ---
 
@@ -30,77 +31,37 @@
 
 ---
 
-## What Jon Needs to Do (for full launch)
+## Infrastructure (Completed Jan 30, 2026)
 
-### 1. 🗄️ Provision a PostgreSQL Database
-The app needs a Postgres database. Easiest options:
+### ✅ Database — Neon PostgreSQL
+- **Database:** `boostcart` on the shared Greenbelt Neon project
+- **Host:** `ep-ancient-sea-aehga5e5.c-2.us-east-2.aws.neon.tech`
+- **Schema pushed:** Store, Offer, UpsellEvent tables created via `prisma db push`
 
-**Option A: Vercel Postgres (recommended — auto-integrates)**
-1. Go to https://vercel.com/greenbelt/boostcart/stores
-2. Click "Create Database" → "Postgres"
-3. Vercel will automatically add the `DATABASE_URL` env var
-4. Redeploy: `vercel deploy --prod`
+### ✅ BigCommerce App Registered
+- **Client ID:** `6lccc4tas1k19rx8pjs9dendbn6u1xc`
+- **Account UUID:** `a33729c6-655c-4690-90df-8147510eedbb`
+- Callback URLs configured in Dev Portal:
+  - Auth: `https://boostcart.vercel.app/api/auth/install`
+  - Load: `https://boostcart.vercel.app/api/auth/load`
+  - Uninstall: `https://boostcart.vercel.app/api/auth/uninstall`
 
-**Option B: Neon.tech (free tier)**
-1. Go to https://neon.tech and create a project called "boostcart"
-2. Copy the connection string
-3. Update env var: `vercel env rm DATABASE_URL production` then `vercel env add DATABASE_URL production`
-4. Paste the connection string
-
-**After DB is provisioned:**
-```bash
-cd /Users/secondbrain/clawd/ventures/bigcommerce-upsell/app
-# Set DATABASE_URL in .env.local with the real connection string
-npx prisma db push   # Creates the tables
-vercel deploy --prod  # Redeploy with real DB
-```
-
-### 2. 🛒 Register BigCommerce App
-1. Go to https://devtools.bigcommerce.com/my/apps
-2. Click "Create an app"
-3. App name: **BoostCart**
-4. Set these callback URLs:
-   - **Auth Callback URL:** `https://boostcart.vercel.app/api/auth/install`
-   - **Load Callback URL:** `https://boostcart.vercel.app/api/auth/load`
-   - **Uninstall Callback URL:** `https://boostcart.vercel.app/api/auth/uninstall`
-5. Required OAuth Scopes:
-   - Orders: `modify`
-   - Products: `read-only`
-   - Content: `modify` (for Scripts API)
-   - Checkout Content: `modify`
-   - Carts: `modify`
-   - Storefront API Tokens: `manage`
-   - Customers: `read-only`
-   - Information & Settings: `read-only`
-6. Copy the **Client ID** and **Client Secret**
-7. Update Vercel env vars:
-   ```bash
-   vercel env rm BC_CLIENT_ID production
-   vercel env add BC_CLIENT_ID production  # paste real client ID
-   vercel env rm BC_CLIENT_SECRET production
-   vercel env add BC_CLIENT_SECRET production  # paste real secret
-   vercel deploy --prod
-   ```
-
-### 3. 💳 Stripe (Future — Not Required for MVP)
+### 💳 Stripe (Future — Not Required for MVP)
 No Stripe integration exists in the current codebase. The app uses BigCommerce's own payment APIs for upsell order processing. Stripe would only be needed if you add subscription billing for the app itself (charging merchants the $29-99/mo SaaS fee).
-
-When ready:
-- Create a Stripe account
-- Build a billing page with Stripe Checkout
-- Add `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` env vars
 
 ---
 
 ## Current Environment Variables
 
-| Variable | Status | Value |
+| Variable | Status | Notes |
 |----------|--------|-------|
-| `DATABASE_URL` | ⚠️ Placeholder | Needs real Postgres connection string |
+| `DATABASE_URL` | ✅ Set | Neon PostgreSQL — `boostcart` database on shared Greenbelt project |
 | `APP_URL` | ✅ Set | `https://boostcart.vercel.app` |
-| `BC_CLIENT_ID` | ⚠️ Placeholder | Needs real BigCommerce app client ID |
-| `BC_CLIENT_SECRET` | ⚠️ Placeholder | Needs real BigCommerce app client secret |
-| `WEBHOOK_SECRET` | ✅ Set | Auto-generated secure hex string |
+| `BC_CLIENT_ID` | ✅ Set | BigCommerce Dev Portal app credentials |
+| `BC_CLIENT_SECRET` | ✅ Set | BigCommerce Dev Portal app credentials |
+| `BC_ACCOUNT_UUID` | ✅ Set | `a33729c6-655c-4690-90df-8147510eedbb` |
+| `WEBHOOK_SECRET` | ✅ Set | Auto-generated secure 64-char hex string |
+| `JWT_SECRET` | ✅ Set | Auto-generated secure 64-char hex string |
 
 ---
 
